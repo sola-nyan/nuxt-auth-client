@@ -1,7 +1,7 @@
 # NOTICE
 
 Not tested to work well.
-This module 
+This module not recomended for production use.
 
 # FEATURE
 
