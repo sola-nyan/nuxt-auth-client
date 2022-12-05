@@ -1,5 +1,5 @@
 /* eslint-disable require-await */
-import { addRouteMiddleware, defineNuxtPlugin, useState, useRuntimeConfig, navigateTo, useCookie } from '#app'
+import { addRouteMiddleware, defineNuxtPlugin, useState, useRuntimeConfig, navigateTo, useCookie, useRouter } from '#app'
 
 interface Dynamic {
   [prop: string]: any
@@ -47,13 +47,20 @@ export default defineNuxtPlugin(async (nuxtApp) => {
       const callSyncApi = async (force: boolean) => {
         if (!state.value.synced || force) {
           state.value.synced = true
-          _fetch(schemeConfig.API.ENDPOINTS.SYNC.PATH)
-            .then((res) => {
-              state.value.isLoggedIn = (res === true)
-            })
-            .catch(() => {
-              state.value.isLoggedIn = false
-            })
+          try {
+            const res = await _fetch(schemeConfig.API.ENDPOINTS.SYNC.PATH)
+            const loggedIn = (res === true)
+            state.value.isLoggedIn = loggedIn
+            if (loggedIn) {
+              if (state.value.onholdNavigate !== undefined) {
+                navigateTo(state.value.onholdNavigate)
+              } else if (modOption.PAGE_PATH.LOGIN_TO !== undefined) {
+                navigateTo(modOption.PAGE_PATH.LOGIN_TO)
+              }
+            }
+          } catch (res) {
+            state.value.isLoggedIn = false
+          }
         }
       }
 

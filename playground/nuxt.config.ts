@@ -5,6 +5,7 @@ export default defineNuxtConfig({
   modules: [
     MyModule
   ],
+  ssr: false,
   auth_client: {
     SCHEME_CONFIG: {
       COOKIE: {

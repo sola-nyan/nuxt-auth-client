@@ -35,6 +35,8 @@ This module not recomended for production use.
 
 - Run `npm install @solanyan/nuxt-auth-client`
 - Add modules `@solanyan/nuxt-auth-client` and config `auth_client` to `nuxt.config.ts`
+- Make sure set `ssr: false` to `nuxt.config.ts`
+    - No support SSR (may be cause errors)
 
 # Default Config
     auth_client: {

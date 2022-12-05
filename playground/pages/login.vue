@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { useNuxtApp } from '#app'
-import { ref } from '~~/.nuxt/imports'
+import { onMounted, ref } from '~~/.nuxt/imports'
 
 const form = ref({
   username: '',

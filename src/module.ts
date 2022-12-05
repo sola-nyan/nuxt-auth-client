@@ -102,6 +102,10 @@ export default defineNuxtModule<ModuleOptions>({
     ROUTER_GUARD_PATHES: ['/auth']
   },
   setup (options, nuxt) {
+    if (nuxt.server !== undefined) {
+      return
+    }
+
     if (!isNuxt3()) {
       return
     }
