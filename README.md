@@ -20,7 +20,7 @@ This module not recomended for production use.
         - $auth.isLoggedIn(): boolean
 - Description:
     - username and password credential login with CSRF token
-    - 
+    - assumed to be used with Spring(Boot) Framework
     - more details please check out source code.
 - API requrement:
     - login api return status code if sucess = 200, failure = 401

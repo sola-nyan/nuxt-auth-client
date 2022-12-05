@@ -3,39 +3,39 @@ import { defineNuxtModule, addPlugin, createResolver, isNuxt3 } from '@nuxt/kit'
 import { defu } from 'defu'
 
 export interface SchemeConfig {
-  COOKIE : {
-    API: {
-      BASE_URL: string
-      CREDENTIALS: RequestCredentials
-      POST_FORM: boolean,
-      ENDPOINTS:{
-        LOGIN: {
+  COOKIE? : {
+    API?: {
+      BASE_URL?: string
+      CREDENTIALS?: RequestCredentials
+      POST_FORM?: boolean,
+      ENDPOINTS?:{
+        LOGIN?: {
           PATH: string
-          PROPERTY: {
-            USERNAME: string
-            PASSWORD: string
+          PROPERTY?: {
+            USERNAME?: string
+            PASSWORD?: string
           }
         }
-        LOGOUT: {
+        LOGOUT?: {
           PATH: string
         }
-        SYNC: {
+        SYNC?: {
           PATH: string
         }
       }
     },
-    CSRF: {
+    CSRF?: {
       ENABLE: boolean
-      HEADER_NAME: string
-      COOKIE_KEY: string
+      HEADER_NAME?: string
+      COOKIE_KEY?: string
     },
-    DEV_MODE: {
+    DEV_MODE?: {
       ENABLE: boolean
-      BASE_URL: string
-      CREDENTIALS: RequestCredentials
+      BASE_URL?: string
+      CREDENTIALS?: RequestCredentials
     }
   },
-  ANONYMOUS: undefined
+  ANONYMOUS?: undefined
 }
 
 export interface ModuleOptions {
