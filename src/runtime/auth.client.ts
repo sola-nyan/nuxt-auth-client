@@ -78,9 +78,7 @@ export default defineNuxtPlugin(async (nuxtApp) => {
         }
 
         return _fetch.raw(schemeConfig.API.ENDPOINTS.LOGIN.PATH, { method: 'POST', body })
-          .then((res) => {
-            const result = (res.status === 200)
-            state.value.isLoggedIn = result
+          .then(async (res) => {
             // navigate if onhold exsists
             if (state.value.onholdNavigate !== undefined) {
               // get and clear onhold navigate
@@ -89,9 +87,9 @@ export default defineNuxtPlugin(async (nuxtApp) => {
               // navigate if login_to exists
               navigateTo(modOption.PAGE_PATH.LOGIN_TO)
             }
-            return state.value.isLoggedIn
+            return await callSyncApi(true)
           })
-          .catch(() => {
+          .catch((res) => {
             state.value.isLoggedIn = false
             return state.value.isLoggedIn
           })
