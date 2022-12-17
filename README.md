@@ -13,9 +13,13 @@ This module not recomended for production use.
 1. COOKIE 
 - Provide methods:
     - do login
-        - $auth.login(username: string, password: string): boolean
+        - $auth.login(username: string, password: string, loginCallback?: LoginCallBack): boolean
+        - type LoginCallback = (success: boolean) => false | void
+            - if return false, skip default navigate process
     - do logout
-        - $auth.logout(): boolean
+        - $auth.logout(logoutCallback?: LogoutCallBack): boolean
+        - type LogoutCallback = () => false | void
+            - if return false, skip default navigate process
     - do check login status  
         - $auth.isLoggedIn(): boolean
 - Description:

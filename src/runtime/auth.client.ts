@@ -5,6 +5,9 @@ interface Dynamic {
   [prop: string]: any
 }
 
+type LoginCallback = (success: boolean) => false | void
+type LogoutCallback = () => false | void
+
 const getModOption = () => {
   const cfg = useRuntimeConfig()
   return cfg.public.auth_client
@@ -65,7 +68,7 @@ export default defineNuxtPlugin(async (nuxtApp) => {
       }
 
       // Add login method
-      _authClient.login = async (username: string, password: string) => {
+      _authClient.login = async (username: string, password: string, loginCallback?: LoginCallback) => {
         let body
         if (schemeConfig.API.POST_FORM) {
           body = new FormData()
@@ -79,28 +82,43 @@ export default defineNuxtPlugin(async (nuxtApp) => {
 
         return _fetch.raw(schemeConfig.API.ENDPOINTS.LOGIN.PATH, { method: 'POST', body })
           .then(async (res) => {
-            // navigate if onhold exsists
-            if (state.value.onholdNavigate !== undefined) {
-              // get and clear onhold navigate
-              navigateTo(state.value.onholdNavigate)
-            } else if (modOption.PAGE_PATH.LOGIN_TO !== undefined) {
-              // navigate if login_to exists
-              navigateTo(modOption.PAGE_PATH.LOGIN_TO)
+            let autoNavigate = true
+            if (loginCallback) {
+              autoNavigate = await loginCallback(true)
+            }
+            if (autoNavigate !== false) {
+              // navigate if onhold exsists
+              if (state.value.onholdNavigate !== undefined) {
+                // get and clear onhold navigate
+                navigateTo(state.value.onholdNavigate)
+              } else if (modOption.PAGE_PATH.LOGIN_TO !== undefined) {
+                // navigate if login_to exists
+                navigateTo(modOption.PAGE_PATH.LOGIN_TO)
+              }
             }
             return await callSyncApi(true)
           })
-          .catch((res) => {
+          .catch(async (res) => {
             state.value.isLoggedIn = false
+            if (loginCallback) {
+              await loginCallback(false)
+            }
             return state.value.isLoggedIn
           })
       }
 
       // Add logout method
-      _authClient.logout = async () => {
+      _authClient.logout = async (logoutCallback?: LogoutCallback) => {
         return _fetch(schemeConfig.API.ENDPOINTS.LOGOUT.PATH, { method: 'POST' }).finally(async () => {
+          let autoNavigate = true
           await callSyncApi(true)
-          if (modOption.PAGE_PATH.LOGOUT_TO !== undefined) {
-            navigateTo(modOption.PAGE_PATH.LOGOUT_TO)
+          if (logoutCallback) {
+            autoNavigate = await logoutCallback()
+          }
+          if (autoNavigate !== false) {
+            if (modOption.PAGE_PATH.LOGOUT_TO !== undefined) {
+              navigateTo(modOption.PAGE_PATH.LOGOUT_TO)
+            }
           }
           return state.value.isLoggedIn
         })

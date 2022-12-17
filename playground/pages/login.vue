@@ -1,3 +1,4 @@
+<!-- eslint-disable no-console -->
 <script setup lang="ts">
 import { useNuxtApp } from '#app'
 import { onMounted, ref } from '~~/.nuxt/imports'
@@ -9,7 +10,13 @@ const form = ref({
 
 const login = () => {
   const nuxt = useNuxtApp()
-  nuxt.$auth.login(form.value.username, form.value.password)
+  nuxt.$auth.login(form.value.username, form.value.password, (success: boolean) => {
+    if (success) {
+      console.log('login sucess')
+    } else {
+      console.log('login failure')
+    }
+  })
 }
 </script>
 
