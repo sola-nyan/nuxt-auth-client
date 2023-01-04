@@ -1,7 +1,8 @@
 import { fileURLToPath } from 'url'
-import { defineNuxtModule, addPlugin, createResolver, isNuxt3 } from '@nuxt/kit'
+import { defineNuxtModule, addPlugin, createResolver, isNuxt3, addImports, addComponent, addComponentsDir } from '@nuxt/kit'
 import { defu } from 'defu'
-
+/** memo */
+type AAD_CLOUD_INSTANCE_ID = 'https://login.microsoftonline.com' | 'https://login.partner.microsoftonline.cn' | 'https://login.microsoftonline.us'
 export interface SchemeConfig {
   COOKIE? : {
     API?: {
@@ -20,7 +21,10 @@ export interface SchemeConfig {
           PATH: string
         }
         SYNC?: {
-          PATH: string
+          PATH: string,
+          PROPERTY?:{
+            LOGGED_IN: string
+          }
         }
       }
     },
@@ -33,6 +37,17 @@ export interface SchemeConfig {
       ENABLE: boolean
       BASE_URL?: string
       CREDENTIALS?: RequestCredentials
+    }
+  },
+  AZURE_AD?: {
+    MSAL: {
+      CLIENT_ID: string,
+      TENANT_ID: string,
+      REDIRECT_URL: string,
+      CACHE_STORAGE?: string,
+      SCOPES?: string[]
+      USE_POPUP_API?: boolean,
+      CLOUD_INSTANCE_ID?: AAD_CLOUD_INSTANCE_ID | string
     }
   },
   ANONYMOUS?: undefined
@@ -77,7 +92,10 @@ export default defineNuxtModule<ModuleOptions>({
               PATH: '/api/auth/logout'
             },
             SYNC: {
-              PATH: '/api/auth/sync'
+              PATH: '/api/auth/sync',
+              PROPERTY: {
+                LOGGED_IN: ''
+              }
             }
           }
         },
@@ -90,6 +108,17 @@ export default defineNuxtModule<ModuleOptions>({
           ENABLE: false,
           BASE_URL: 'https://localhost:8443/',
           CREDENTIALS: 'include'
+        }
+      },
+      AZURE_AD: {
+        MSAL: {
+          CLIENT_ID: '',
+          TENANT_ID: '',
+          REDIRECT_URL: '',
+          CACHE_STORAGE: 'sessionStorage',
+          SCOPES: ['User.Read'],
+          USE_POPUP_API: false,
+          CLOUD_INSTANCE_ID: 'https://login.microsoftonline.com'
         }
       },
       ANONYMOUS: undefined
@@ -117,8 +146,16 @@ export default defineNuxtModule<ModuleOptions>({
 
     const { resolve } = createResolver(import.meta.url)
     const runtimeDir = fileURLToPath(new URL('./runtime', import.meta.url))
+    const composableDir = fileURLToPath(new URL('./runtime/', import.meta.url))
     nuxt.options.build.transpile.push(runtimeDir)
 
     addPlugin(resolve(runtimeDir, 'auth.client'))
+
+    addComponentsDir({
+      path: resolve(runtimeDir, 'schemes'),
+      pathPrefix: false,
+      prefix: '',
+      global: false
+    })
   }
 })

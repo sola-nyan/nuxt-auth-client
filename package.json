@@ -21,7 +21,9 @@
     "dev:prepare": "nuxt-module-build --stub && nuxi prepare playground"
   },
   "dependencies": {
+    "@azure/msal-browser": "^2.32.1",
     "@nuxt/kit": "^3.0.0",
+    "@solanyan/object-wrapper": "^1.0.3",
     "defu": "^6.1.1"
   },
   "devDependencies": {

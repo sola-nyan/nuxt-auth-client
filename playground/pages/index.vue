@@ -1,7 +1,11 @@
 <template>
   <div>
     <NuxtLink to="/login">
-      /login
+      /login (COOKIE)
+    </NuxtLink>
+    <hr>
+    <NuxtLink to="/aadLogin">
+      /aadLogin (AZURE AD)
     </NuxtLink>
     <hr>
     <NuxtLink to="/logout">
