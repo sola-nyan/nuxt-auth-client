@@ -107,8 +107,14 @@ export const installAzureADScheme = async (nuxtApp: NuxtApp) => {
   // get idToken
   _authClient.claimIdToken = async () => {
     if (state.value.isLoggedIn) {
-      const result = await myMSALObj.acquireTokenSilent(request)
-      return result.idToken
+      try {
+        const result = await myMSALObj.acquireTokenSilent(request)
+        return result.idToken
+      } catch (e) {
+        console.error(e)
+        state.value.isLoggedIn = false
+        return null
+      }
     }
     return null
   }
