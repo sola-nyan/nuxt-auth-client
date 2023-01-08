@@ -10,6 +10,7 @@ export const installAzureADScheme = async (nuxtApp: NuxtApp) => {
   const modOption = getModOption()
   const schemeConfig = modOption.SCHEME_CONFIG.AZURE_AD
   const _authClient: any = {}
+  let _accountInfo: msal.AccountInfo
 
   const state = useState('auth_client_scheme_aad_state', () => {
     return {
@@ -43,18 +44,23 @@ export const installAzureADScheme = async (nuxtApp: NuxtApp) => {
 
   const myMSALObj = new msal.PublicClientApplication(msalConfig)
 
-  const syncAccountInfo = () => {
-    const accs: msal.AccountInfo[] = myMSALObj.getAllAccounts()
-    state.value.accountInfo = accs
-    state.value.isLoggedIn = accs?.length > 0
-  }
-
-  await myMSALObj.handleRedirectPromise().then((response: any) => { syncAccountInfo() })
-
   // basic request
   const request = {
     scopes: schemeConfig.MSAL.SCOPES
   }
+
+  const syncAccountInfo = (force? :boolean) => {
+    const accs: msal.AccountInfo[] = myMSALObj.getAllAccounts()
+    state.value.accountInfo = accs
+    state.value.isLoggedIn = accs?.length > 0
+    _accountInfo = accs[0]
+    if (state.value.isLoggedIn) {
+      myMSALObj.setActiveAccount(_accountInfo)
+      myMSALObj.acquireTokenSilent(request)
+    }
+  }
+
+  await myMSALObj.handleRedirectPromise().then((response: any) => { syncAccountInfo() })
 
   // Add login method
   _authClient.login = (force?: boolean) => {
@@ -65,8 +71,7 @@ export const installAzureADScheme = async (nuxtApp: NuxtApp) => {
     if (schemeConfig.MSAL.USE_POPUP_API) {
       // USE POPUP API
       myMSALObj.loginPopup(request).then((res) => {
-        console.log(res)
-        state.value.isLoggedIn = true
+        syncAccountInfo(true)
         navigateTo(modOption.PAGE_PATH.LOGIN_TO)
       })
     } else {
@@ -99,10 +104,14 @@ export const installAzureADScheme = async (nuxtApp: NuxtApp) => {
     return state.value.isLoggedIn
   }
 
-  // get accountInfo state method
-  // _authClient.getAccountInfo = () => {
-  //   return state.value.accountInfo
-  // }
+  // get idToken
+  _authClient.claimIdToken = async () => {
+    if (state.value.isLoggedIn) {
+      const result = await myMSALObj.acquireTokenSilent(request)
+      return result.idToken
+    }
+    return null
+  }
 
   // provide $auth
   nuxtApp.provide('auth', _authClient)
@@ -126,6 +135,11 @@ export const installAzureADScheme = async (nuxtApp: NuxtApp) => {
 
     // bypass if meta value key of auth is false.
     if (to.meta?.auth === false) {
+      return true
+    }
+
+    // no guard login page
+    if (to.path === modOption.PAGE_PATH.LOGIN) {
       return true
     }
 

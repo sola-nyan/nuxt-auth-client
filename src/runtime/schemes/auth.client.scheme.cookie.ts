@@ -144,6 +144,11 @@ export const installCookieScheme = async (nuxtApp: NuxtApp) => {
       return true
     }
 
+    // no guard login page
+    if (to.path === modOption.PAGE_PATH.LOGIN) {
+      return true
+    }
+
     // navigate to login page if access guarded path with no logged in
     for (const guardPath of modOption.ROUTER_GUARD_PATHES) {
       if (to.path.startsWith(guardPath)) {
