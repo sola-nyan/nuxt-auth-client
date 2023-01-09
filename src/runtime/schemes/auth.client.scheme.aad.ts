@@ -1,6 +1,6 @@
 /* eslint-disable no-console */
-
-import { NuxtApp, useState, addRouteMiddleware, navigateTo } from '#app'
+import { useSessionStorage } from '@vueuse/core'
+import { NuxtApp, useState, addRouteMiddleware, navigateTo, useRuntimeConfig } from '#app'
 import * as msal from '@azure/msal-browser'
 import { getModOption } from './auth.client.utils'
 
@@ -12,10 +12,11 @@ export const installAzureADScheme = async (nuxtApp: NuxtApp) => {
   const _authClient: any = {}
   let _accountInfo: msal.AccountInfo
 
+  const onholdNavigatePath = useSessionStorage('auth_client_onholdNavigate_path', '')
+
   const state = useState('auth_client_scheme_aad_state', () => {
     return {
       isLoggedIn: false,
-      // onholdNavigate: undefined as any, (inprogress)
       accountInfo: [] as msal.AccountInfo[],
       synced: false
     }
@@ -28,7 +29,7 @@ export const installAzureADScheme = async (nuxtApp: NuxtApp) => {
       redirectUri: schemeConfig.MSAL.REDIRECT_URL
     },
     cache: {
-      cacheLocation: 'localStorage',
+      cacheLocation: schemeConfig.MSAL.CACHE_STORAGE,
       secureCookies: true
     },
     system: {
@@ -60,6 +61,7 @@ export const installAzureADScheme = async (nuxtApp: NuxtApp) => {
     }
   }
 
+  // syncAccountInfo then MSAL onready
   await myMSALObj.handleRedirectPromise().then((response: any) => { syncAccountInfo() })
 
   // Add login method
@@ -72,7 +74,10 @@ export const installAzureADScheme = async (nuxtApp: NuxtApp) => {
       // USE POPUP API
       myMSALObj.loginPopup(request).then((res) => {
         syncAccountInfo(true)
-        navigateTo(modOption.PAGE_PATH.LOGIN_TO)
+        if (modOption.PAGE_PATH.LOGIN_TO !== undefined) {
+          // navigate if login_to exists
+          navigateTo(modOption.PAGE_PATH.LOGIN_TO)
+        }
       })
     } else {
       // USE REDIRECT API
@@ -128,8 +133,21 @@ export const installAzureADScheme = async (nuxtApp: NuxtApp) => {
       console.log(`navigate : ${from.path} -> ${to.path}`)
     }
 
+    // if no login page
+    if (to.path === modOption.PAGE_PATH.LOGIN && schemeConfig.NO_LOGIN_PAGE) {
+      _authClient.login()
+      return false
+    }
+
     // if user logged in.
     if (state.value.isLoggedIn) {
+      if (onholdNavigatePath.value !== '') {
+        // get and clear onhold navigate
+        const onhold = onholdNavigatePath.value
+        onholdNavigatePath.value = ''
+        return navigateTo(onhold)
+      }
+
       // navagate to home if user move to login page directly
       if (to.path === modOption.PAGE_PATH.LOGIN) {
         return navigateTo(modOption.PAGE_PATH.LOGIN_TO)
@@ -152,20 +170,13 @@ export const installAzureADScheme = async (nuxtApp: NuxtApp) => {
     // navigate to login page if access guarded path with no logged in
     for (const guardPath of modOption.ROUTER_GUARD_PATHES) {
       if (to.path.startsWith(guardPath)) {
-        // state.value.onholdNavigate = to
+        onholdNavigatePath.value = to.path
         return navigateTo(modOption.PAGE_PATH.LOGIN)
       }
-    }
-
-    // clear onhold
-    if (to.path !== modOption.PAGE_PATH.LOGIN) {
-      // state.value.onholdNavigate = undefined
     }
 
     return true
   },
   { global: true }
   )
-
-  syncAccountInfo()
 }

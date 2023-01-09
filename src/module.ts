@@ -1,5 +1,5 @@
 import { fileURLToPath } from 'url'
-import { defineNuxtModule, addPlugin, createResolver, isNuxt3, addImports, addComponent, addComponentsDir } from '@nuxt/kit'
+import { defineNuxtModule, addPlugin, createResolver, isNuxt3, addComponentsDir } from '@nuxt/kit'
 import { defu } from 'defu'
 /** memo */
 type AAD_CLOUD_INSTANCE_ID = 'https://login.microsoftonline.com' | 'https://login.partner.microsoftonline.cn' | 'https://login.microsoftonline.us'
@@ -48,7 +48,8 @@ export interface SchemeConfig {
       SCOPES?: string[]
       USE_POPUP_API?: boolean,
       CLOUD_INSTANCE_ID?: AAD_CLOUD_INSTANCE_ID | string
-    }
+    },
+    NO_LOGIN_PAGE?: boolean
   },
   ANONYMOUS?: undefined
 }
@@ -119,7 +120,8 @@ export default defineNuxtModule<ModuleOptions>({
           SCOPES: ['User.Read'],
           USE_POPUP_API: false,
           CLOUD_INSTANCE_ID: 'https://login.microsoftonline.com'
-        }
+        },
+        NO_LOGIN_PAGE: true
       },
       ANONYMOUS: undefined
     },

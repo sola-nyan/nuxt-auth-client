@@ -11,13 +11,15 @@ console.log('-- PLAY GROUND PUBLIC RUNTIME CONFIG:')
 console.log(`TEST_ENDPOINT : ${process.env.TEST_ENDPOINT}`)
 
 export default defineNuxtConfig({
+
   runtimeConfig: {
     public: {
       TEST_ENDPOINT: process.env.TEST_ENDPOINT
     }
   },
   modules: [
-    MyModule
+    MyModule,
+    '@vueuse/nuxt'
   ],
   ssr: false,
   auth_client: {
@@ -57,8 +59,8 @@ export default defineNuxtConfig({
       },
       AZURE_AD: {
         MSAL: {
-          CLIENT_ID: process.env.AAD_CLIENT_ID,
-          TENANT_ID: process.env.AAD_TENANT_ID,
+          CLIENT_ID: process.env.AAD_CLIENT_ID ?? '',
+          TENANT_ID: process.env.AAD_TENANT_ID ?? '',
           REDIRECT_URL: 'https://localhost:3000/aadLogin',
           USE_POPUP_API: false,
           SCOPES: ['User.Read']
@@ -66,7 +68,7 @@ export default defineNuxtConfig({
       }
     },
     PAGE_PATH: {
-      LOGIN: '/aadlogin'
+      LOGIN: '/aadLogin'
     },
     ROUTER_GUARD_PATHES: ['/auth']
   }
