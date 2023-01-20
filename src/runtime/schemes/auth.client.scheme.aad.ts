@@ -171,7 +171,12 @@ export const installAzureADScheme = async (nuxtApp: NuxtApp) => {
     for (const guardPath of modOption.ROUTER_GUARD_PATHES) {
       if (to.path.startsWith(guardPath)) {
         onholdNavigatePath.value = to.path
-        return navigateTo(modOption.PAGE_PATH.LOGIN)
+        if (schemeConfig.NO_LOGIN_PAGE) {
+          _authClient.login()
+          return false
+        } else {
+          return navigateTo(modOption.PAGE_PATH.LOGIN)
+        }
       }
     }
 
