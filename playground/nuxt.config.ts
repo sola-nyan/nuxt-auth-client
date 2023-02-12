@@ -23,7 +23,7 @@ export default defineNuxtConfig({
   ],
   ssr: false,
   auth_client: {
-    SCHEME: 'AZURE_AD',
+    SCHEME: 'COOKIE',
     SCHEME_CONFIG: {
       COOKIE: {
         API: {
@@ -42,7 +42,8 @@ export default defineNuxtConfig({
               PATH: '/api/auth/logout'
             },
             SYNC: {
-              PATH: '/api/auth/sync'
+              PATH: '/api/auth/sync',
+              POLLING_SPAN_SEC: 180
             }
           }
         },
@@ -68,7 +69,7 @@ export default defineNuxtConfig({
       }
     },
     PAGE_PATH: {
-      LOGIN: '/aadLogin'
+      LOGIN: '/login'
     },
     ROUTER_GUARD_PATHES: ['/auth']
   }

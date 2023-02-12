@@ -22,6 +22,7 @@ export interface SchemeConfig {
         }
         SYNC?: {
           PATH: string,
+          POLLING_SPAN_SEC?: number,
           PROPERTY?:{
             LOGGED_IN: string
           }
@@ -94,6 +95,7 @@ export default defineNuxtModule<ModuleOptions>({
             },
             SYNC: {
               PATH: '/api/auth/sync',
+              POLLING_SPAN_SEC: 180,
               PROPERTY: {
                 LOGGED_IN: ''
               }

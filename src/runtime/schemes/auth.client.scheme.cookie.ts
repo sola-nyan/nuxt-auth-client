@@ -26,11 +26,15 @@ export const installCookieScheme = async (nuxtApp: NuxtApp) => {
   const fetchOption = {
     baseURL: schemeConfig.DEV_MODE.ENABLE ? schemeConfig.DEV_MODE.BASE_URL : schemeConfig.API.BASE_URL,
     credentials: (schemeConfig.DEV_MODE.ENABLE ? schemeConfig.DEV_MODE.CREDENTIALS : schemeConfig.API.CREDENTIALS) as RequestCredentials,
-    async onRequest ({ options }: any) {
+    async onRequest (context: any) {
       const CSRF_OPT = schemeConfig.CSRF
-      if (CSRF_OPT.ENABLE) {
-        if (options.headers === undefined) { options.headers = {} }
-        options.headers[CSRF_OPT.HEADER_NAME] = useCookie(CSRF_OPT.COOKIE_KEY).value
+
+      const method = context.options.method?.toUpperCase() ?? ''
+      if (!['POST', 'PUT', 'DELETE', 'PATCH'].includes(method)) {
+        if (CSRF_OPT.ENABLE) {
+          if (context.options.headers === undefined) { context.options.headers = {} }
+          context.options.headers[CSRF_OPT.HEADER_NAME] = useCookie(CSRF_OPT.COOKIE_KEY).value
+        }
       }
     }
   }
@@ -40,7 +44,10 @@ export const installCookieScheme = async (nuxtApp: NuxtApp) => {
   // function of call sync api for get token and check loggin status.
   const callSyncApi = async (force: boolean) => {
     if (!state.value.synced || force) {
-      state.value.synced = true
+      if (!state.value.synced) {
+        state.value.synced = true
+        syncPolling()
+      }
       try {
         const res = await _fetch(schemeConfig.API.ENDPOINTS.SYNC.PATH) as any
 
@@ -56,6 +63,13 @@ export const installCookieScheme = async (nuxtApp: NuxtApp) => {
       }
     }
     return state.value.isLoggedIn
+  }
+
+  const syncPolling = () => {
+    setTimeout(async () => {
+      await callSyncApi(true)
+      syncPolling()
+    }, schemeConfig.API.ENDPOINTS.SYNC.POLLING_SPAN_SEC * 1000)
   }
 
   // Add login method

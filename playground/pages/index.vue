@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, useNuxtApp, useRuntimeConfig } from '~~/.nuxt/imports'
+import { ref, useCookie, useNuxtApp, useRuntimeConfig } from '~~/.nuxt/imports'
 
 const endpoint = ref(useRuntimeConfig().public.TEST_ENDPOINT ?? '')
 const response = ref('')
@@ -12,6 +12,16 @@ const callApi = async () => {
       }
     })
     response.value = JSON.stringify(res)
+  } catch (e) {
+    console.log(e)
+  }
+}
+
+const callApiCookie = async () => {
+  try {
+    const res: any = await $fetch(endpoint.value, { credentials: 'include' })
+    response.value = JSON.stringify(res)
+    console.log(res)
   } catch (e) {
     console.log(e)
   }
@@ -45,7 +55,10 @@ const callApi = async () => {
     </NuxtLink>
     <hr>
     <button @click="callApi">
-      API CALL
+      API CALL (Bearer)
+    </button>
+    <button @click="callApiCookie">
+      API CALL (Cookie)
     </button>
     <input v-model="endpoint" type="text" size="80"><br>
     <textarea v-model="response" style="width: 800px; height:400px;" />
