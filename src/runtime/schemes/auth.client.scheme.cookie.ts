@@ -28,10 +28,9 @@ export const installCookieScheme = async (nuxtApp: NuxtApp) => {
     credentials: (schemeConfig.DEV_MODE.ENABLE ? schemeConfig.DEV_MODE.CREDENTIALS : schemeConfig.API.CREDENTIALS) as RequestCredentials,
     async onRequest (context: any) {
       const CSRF_OPT = schemeConfig.CSRF
-
-      const method = context.options.method?.toUpperCase() ?? ''
-      if (!['post', 'put', 'delete', 'patch'].includes(method)) {
-        if (CSRF_OPT.ENABLE) {
+      if (CSRF_OPT.ENABLE) {
+        const method = context.options.method?.toUpperCase() ?? ''
+        if (['POST', 'PUT', 'DELETE', 'PATCH'].includes(method)) {
           if (context.options.headers === undefined) { context.options.headers = {} }
           context.options.headers[CSRF_OPT.HEADER_NAME] = useCookie(CSRF_OPT.COOKIE_KEY).value
         }
