@@ -21,18 +21,18 @@
     "dev:prepare": "nuxt-module-build --stub && nuxi prepare playground"
   },
   "dependencies": {
-    "@azure/msal-browser": "^2.32.1",
-    "@nuxt/kit": "^3.0.0",
+    "@azure/msal-browser": "^2.33.0",
+    "@nuxt/kit": "^3.2.2",
     "@solanyan/object-wrapper": "^1.0.3",
-    "defu": "^6.1.1"
+    "defu": "^6.1.2"
   },
   "devDependencies": {
     "@nuxt/module-builder": "^0.2.1",
-    "@nuxt/schema": "^3.0.0",
+    "@nuxt/schema": "^3.2.2",
     "@nuxtjs/eslint-config-typescript": "^12.0.0",
-    "@vueuse/core": "^9.10.0",
-    "@vueuse/nuxt": "^9.10.0",
-    "eslint": "^8.29.0",
-    "nuxt": "^3.0.0"
+    "@vueuse/core": "^9.13.0",
+    "@vueuse/nuxt": "^9.13.0",
+    "eslint": "^8.34.0",
+    "nuxt": "^3.2.2"
   }
 }
