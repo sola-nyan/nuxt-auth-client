@@ -124,6 +124,11 @@ export const installAzureADScheme = async (nuxtApp: NuxtApp) => {
     return null
   }
 
+  // get active account info
+  _authClient.activeAccount = () => {
+    return _accountInfo
+  }
+
   // provide $auth
   nuxtApp.provide('auth', _authClient)
 
